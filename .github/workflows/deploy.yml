@@ -1,0 +1,27 @@
+name: Deploy Web App 1
+
+on:
+  push:
+    branches:
+      - main # Ganti dengan branch utama Anda
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy ke Server 1 (Port 2000)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Hapus file lama dan salin yang baru
+            rm -rf /var/www/web1.com/public_html/*
+            rsync -avz --delete ./ /var/www/web1.com/public_html/
+            # Beri izin yang benar pada file yang baru disalin
+            sudo chown -R www-data:www-data /var/www/web1.com/public_html
+            echo "Deployment Aplikasi 1 selesai."
